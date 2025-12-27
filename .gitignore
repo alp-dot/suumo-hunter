@@ -34,6 +34,11 @@ Thumbs.db
 **/terraform.tfvars
 .terraform.lock.hcl
 
+# Terraform environments (except _example and modules)
+terraform/nakano/
+# terraform/shibuya/
+# terraform/shinjuku/
+
 # Environment
 .env
 .env.local
