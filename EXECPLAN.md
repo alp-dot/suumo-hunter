@@ -1019,3 +1019,23 @@ Discord通知が届き、以下のような内容が表示される：
 - デプロイは何度実行しても同じ結果になる（Terraformの冪等性）
 - Lambda実行が失敗した場合、CloudWatch Logsでエラー原因を確認
 - S3ファイルが破損した場合、手動で削除して再実行すれば初期状態から再開
+
+### Status: ✅ COMPLETED (2024-12-27)
+
+**実行結果:**
+- `nakano` インスタンスをデプロイ
+- Lambda関数 `suumo-hunter-nakano` を手動実行
+- SUUMOから440件の物件を取得
+- S3バケット `suumo-hunter-nakano-properties-069284887449` にデータ保存
+- Discord Webhookへ通知送信成功
+- CloudWatch Logsにログ出力確認
+
+**作成されたリソース:**
+- Lambda: `suumo-hunter-nakano`
+- S3: `suumo-hunter-nakano-properties-069284887449`
+- IAM Role: `suumo-hunter-lambda-role`
+- EventBridge: `suumo-hunter-nakano-schedule`
+- CloudWatch Log Group: `/aws/lambda/suumo-hunter-nakano`
+
+**修正点:**
+- IAMポリシーに `s3:ListBucket` 権限を追加（バケット存在確認に必要）
