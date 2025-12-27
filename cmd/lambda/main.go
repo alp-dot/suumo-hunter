@@ -80,7 +80,7 @@ func Handler(ctx context.Context) error {
 		// Use merged data for regression, but only analyze new properties
 		scoredProperties := analyze.AnalyzeNewProperties(mergedProperties, newProperties)
 
-		log.Println("Sending LINE notification...")
+		log.Println("Sending Discord notification...")
 		if err := notify.Notify(ctx, scoredProperties); err != nil {
 			return fmt.Errorf("failed to send notification: %w", err)
 		}
