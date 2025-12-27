@@ -21,6 +21,7 @@ var csvHeaders = []string{
 	"layout",
 	"area",
 	"walk_minutes",
+	"nearest_station",
 	"url",
 }
 
@@ -88,19 +89,20 @@ func recordToProperty(record []string, colIndex map[string]int) Property {
 	walkMinutes, _ := strconv.Atoi(getField("walk_minutes"))
 
 	return Property{
-		ID:            getField("id"),
-		Name:          getField("name"),
-		Address:       getField("address"),
-		Age:           age,
-		Floor:         floor,
-		Rent:          rent,
-		ManagementFee: managementFee,
-		Deposit:       getField("deposit"),
-		KeyMoney:      getField("key_money"),
-		Layout:        getField("layout"),
-		Area:          area,
-		WalkMinutes:   walkMinutes,
-		URL:           getField("url"),
+		ID:             getField("id"),
+		Name:           getField("name"),
+		Address:        getField("address"),
+		Age:            age,
+		Floor:          floor,
+		Rent:           rent,
+		ManagementFee:  managementFee,
+		Deposit:        getField("deposit"),
+		KeyMoney:       getField("key_money"),
+		Layout:         getField("layout"),
+		Area:           area,
+		WalkMinutes:    walkMinutes,
+		NearestStation: getField("nearest_station"),
+		URL:            getField("url"),
 	}
 }
 
@@ -141,6 +143,7 @@ func propertyToRecord(p Property) []string {
 		p.Layout,
 		strconv.FormatFloat(p.Area, 'f', -1, 64),
 		strconv.Itoa(p.WalkMinutes),
+		p.NearestStation,
 		p.URL,
 	}
 }

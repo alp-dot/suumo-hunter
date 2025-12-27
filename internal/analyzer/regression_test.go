@@ -238,13 +238,13 @@ func TestRegressionCoefficients(t *testing.T) {
 		}
 	}
 
-	coefficients, err := analyzer.fitRegression(properties)
+	model, err := analyzer.fitRegression(properties)
 	if err != nil {
 		t.Fatalf("fitRegression failed: %v", err)
 	}
 
 	// Check that area coefficient is close to 2000
-	areaCoef := coefficients[1]
+	areaCoef := model.coefficients[1]
 	if math.Abs(areaCoef-2000) > 100 {
 		t.Errorf("Area coefficient should be ~2000, got %f", areaCoef)
 	}
@@ -252,7 +252,11 @@ func TestRegressionCoefficients(t *testing.T) {
 
 func TestPrediction(t *testing.T) {
 	analyzer := NewAnalyzer()
-	coefficients := []float64{50000, 2000, -500, 1000, -500}
+	model := &regressionModel{
+		coefficients: []float64{50000, 2000, -500, 1000, -500},
+		stations:     nil,
+		stationIndex: nil,
+	}
 
 	property := models.Property{
 		Area:        25.0,
@@ -261,7 +265,7 @@ func TestPrediction(t *testing.T) {
 		WalkMinutes: 10,
 	}
 
-	predicted := analyzer.predict(property, coefficients)
+	predicted := analyzer.predict(property, model)
 
 	// Expected: 50000 + 2000*25 - 500*5 + 1000*3 - 500*10
 	// = 50000 + 50000 - 2500 + 3000 - 5000 = 95500

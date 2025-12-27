@@ -235,19 +235,21 @@ func (s *Scraper) parsePropertyItem(item *goquery.Selection) []models.Property {
 
 	age, _ := models.ParseAge(buildingAge)
 
-	// Parse access information (walking time to station)
-	// Take the first station's walking time
+	// Parse access information (walking time to station and station name)
+	// Take the first station's walking time and name
 	var walkMinutes int
+	var nearestStation string
 	item.Find("li.cassetteitem_detail-col2 div.cassetteitem_detail-text").Each(func(i int, div *goquery.Selection) {
 		if i == 0 {
 			text := strings.TrimSpace(div.Text())
 			walkMinutes, _ = models.ParseWalkMinutes(text)
+			nearestStation = models.ParseStationName(text)
 		}
 	})
 
 	// Each room/unit is in a table row
 	item.Find("table.cassetteitem_other tbody tr").Each(func(_ int, row *goquery.Selection) {
-		prop := s.parseRoomRow(row, name, address, age, walkMinutes, buildingFloors)
+		prop := s.parseRoomRow(row, name, address, age, walkMinutes, nearestStation, buildingFloors)
 		if prop.ID != "" {
 			properties = append(properties, prop)
 		}
@@ -257,7 +259,7 @@ func (s *Scraper) parsePropertyItem(item *goquery.Selection) []models.Property {
 }
 
 // parseRoomRow extracts information for a single room/unit.
-func (s *Scraper) parseRoomRow(row *goquery.Selection, name, address string, age, walkMinutes int, buildingFloors string) models.Property {
+func (s *Scraper) parseRoomRow(row *goquery.Selection, name, address string, age, walkMinutes int, nearestStation, buildingFloors string) models.Property {
 	// Floor
 	floorText := strings.TrimSpace(row.Find("td").Eq(2).Text())
 	floor, _ := models.ParseFloor(floorText)
@@ -300,19 +302,20 @@ func (s *Scraper) parseRoomRow(row *goquery.Selection, name, address string, age
 	})
 
 	return models.Property{
-		ID:            id,
-		Name:          name,
-		Address:       address,
-		Age:           age,
-		Floor:         floor,
-		Rent:          rent,
-		ManagementFee: managementFee,
-		Deposit:       deposit,
-		KeyMoney:      keyMoney,
-		Layout:        layout,
-		Area:          area,
-		WalkMinutes:   walkMinutes,
-		URL:           url,
+		ID:             id,
+		Name:           name,
+		Address:        address,
+		Age:            age,
+		Floor:          floor,
+		Rent:           rent,
+		ManagementFee:  managementFee,
+		Deposit:        deposit,
+		KeyMoney:       keyMoney,
+		Layout:         layout,
+		Area:           area,
+		WalkMinutes:    walkMinutes,
+		NearestStation: nearestStation,
+		URL:            url,
 	}
 }
 

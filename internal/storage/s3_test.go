@@ -34,9 +34,9 @@ func (m *mockS3Client) PutObject(ctx context.Context, params *s3.PutObjectInput,
 }
 
 func TestDownload(t *testing.T) {
-	csvData := `id,name,address,age,floor,rent,management_fee,deposit,key_money,layout,area,walk_minutes,url
-jnc_001,テストマンション,東京都渋谷区,5,3,79000,5000,1ヶ月,1ヶ月,1K,25.5,8,https://suumo.jp/chintai/jnc_001/
-jnc_002,テストアパート,東京都新宿区,10,2,65000,3000,-,1ヶ月,1R,20,5,https://suumo.jp/chintai/jnc_002/
+	csvData := `id,name,address,age,floor,rent,management_fee,deposit,key_money,layout,area,walk_minutes,nearest_station,url
+jnc_001,テストマンション,東京都渋谷区,5,3,79000,5000,1ヶ月,1ヶ月,1K,25.5,8,渋谷,https://suumo.jp/chintai/jnc_001/
+jnc_002,テストアパート,東京都新宿区,10,2,65000,3000,-,1ヶ月,1R,20,5,新宿,https://suumo.jp/chintai/jnc_002/
 `
 
 	mock := &mockS3Client{
@@ -127,19 +127,20 @@ func TestUpload(t *testing.T) {
 
 	properties := []models.Property{
 		{
-			ID:            "jnc_001",
-			Name:          "テストマンション",
-			Address:       "東京都渋谷区",
-			Age:           5,
-			Floor:         3,
-			Rent:          79000,
-			ManagementFee: 5000,
-			Deposit:       "1ヶ月",
-			KeyMoney:      "1ヶ月",
-			Layout:        "1K",
-			Area:          25.5,
-			WalkMinutes:   8,
-			URL:           "https://suumo.jp/chintai/jnc_001/",
+			ID:             "jnc_001",
+			Name:           "テストマンション",
+			Address:        "東京都渋谷区",
+			Age:            5,
+			Floor:          3,
+			Rent:           79000,
+			ManagementFee:  5000,
+			Deposit:        "1ヶ月",
+			KeyMoney:       "1ヶ月",
+			Layout:         "1K",
+			Area:           25.5,
+			WalkMinutes:    8,
+			NearestStation: "渋谷",
+			URL:            "https://suumo.jp/chintai/jnc_001/",
 		},
 	}
 
@@ -221,34 +222,36 @@ func TestDownloadAndUploadRoundTrip(t *testing.T) {
 
 	original := []models.Property{
 		{
-			ID:            "jnc_001",
-			Name:          "テストマンション",
-			Address:       "東京都渋谷区渋谷1-1-1",
-			Age:           5,
-			Floor:         3,
-			Rent:          79000,
-			ManagementFee: 5000,
-			Deposit:       "1ヶ月",
-			KeyMoney:      "1ヶ月",
-			Layout:        "1K",
-			Area:          25.5,
-			WalkMinutes:   8,
-			URL:           "https://suumo.jp/chintai/jnc_001/",
+			ID:             "jnc_001",
+			Name:           "テストマンション",
+			Address:        "東京都渋谷区渋谷1-1-1",
+			Age:            5,
+			Floor:          3,
+			Rent:           79000,
+			ManagementFee:  5000,
+			Deposit:        "1ヶ月",
+			KeyMoney:       "1ヶ月",
+			Layout:         "1K",
+			Area:           25.5,
+			WalkMinutes:    8,
+			NearestStation: "渋谷",
+			URL:            "https://suumo.jp/chintai/jnc_001/",
 		},
 		{
-			ID:            "jnc_002",
-			Name:          "テストアパート",
-			Address:       "東京都新宿区新宿2-2-2",
-			Age:           10,
-			Floor:         2,
-			Rent:          65000,
-			ManagementFee: 3000,
-			Deposit:       "-",
-			KeyMoney:      "1ヶ月",
-			Layout:        "1R",
-			Area:          20.0,
-			WalkMinutes:   5,
-			URL:           "https://suumo.jp/chintai/jnc_002/",
+			ID:             "jnc_002",
+			Name:           "テストアパート",
+			Address:        "東京都新宿区新宿2-2-2",
+			Age:            10,
+			Floor:          2,
+			Rent:           65000,
+			ManagementFee:  3000,
+			Deposit:        "-",
+			KeyMoney:       "1ヶ月",
+			Layout:         "1R",
+			Area:           20.0,
+			WalkMinutes:    5,
+			NearestStation: "新宿",
+			URL:            "https://suumo.jp/chintai/jnc_002/",
 		},
 	}
 

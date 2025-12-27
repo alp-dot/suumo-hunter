@@ -10,19 +10,20 @@ import (
 
 // Property represents a rental property listing from SUUMO.
 type Property struct {
-	ID            string  `csv:"id"`             // 物件ID (jnc_XXXXXXXXXXXX形式)
-	Name          string  `csv:"name"`           // 物件名
-	Address       string  `csv:"address"`        // 住所
-	Age           int     `csv:"age"`            // 築年数
-	Floor         int     `csv:"floor"`          // 階数
-	Rent          float64 `csv:"rent"`           // 家賃（円）
-	ManagementFee float64 `csv:"management_fee"` // 管理費（円）
-	Deposit       string  `csv:"deposit"`        // 敷金
-	KeyMoney      string  `csv:"key_money"`      // 礼金
-	Layout        string  `csv:"layout"`         // 間取り
-	Area          float64 `csv:"area"`           // 専有面積（m²）
-	WalkMinutes   int     `csv:"walk_minutes"`   // 駅徒歩分数
-	URL           string  `csv:"url"`            // 物件詳細URL
+	ID             string  `csv:"id"`              // 物件ID (jnc_XXXXXXXXXXXX形式)
+	Name           string  `csv:"name"`            // 物件名
+	Address        string  `csv:"address"`         // 住所
+	Age            int     `csv:"age"`             // 築年数
+	Floor          int     `csv:"floor"`           // 階数
+	Rent           float64 `csv:"rent"`            // 家賃（円）
+	ManagementFee  float64 `csv:"management_fee"`  // 管理費（円）
+	Deposit        string  `csv:"deposit"`         // 敷金
+	KeyMoney       string  `csv:"key_money"`       // 礼金
+	Layout         string  `csv:"layout"`          // 間取り
+	Area           float64 `csv:"area"`            // 専有面積（m²）
+	WalkMinutes    int     `csv:"walk_minutes"`    // 駅徒歩分数
+	NearestStation string  `csv:"nearest_station"` // 最寄り駅名
+	URL            string  `csv:"url"`             // 物件詳細URL
 }
 
 // TotalRent returns the total monthly cost (rent + management fee).
@@ -63,6 +64,10 @@ var (
 	// floorRegex matches patterns like "3階", "3-4階" (takes first number)
 	// Does not match basement floors like "B1階"
 	floorRegex = regexp.MustCompile(`^(\d+)(?:-\d+)?階`)
+
+	// stationRegex matches patterns like "JR中央線/吉祥寺駅 歩8分", "東京メトロ丸ノ内線/新宿駅 歩5分"
+	// Captures the station name (e.g., "吉祥寺", "新宿")
+	stationRegex = regexp.MustCompile(`(?:/|線)?([^/\s]+?)駅`)
 )
 
 // ParseRent converts a rent string to yen.
@@ -192,6 +197,24 @@ func ParseFloor(s string) (int, error) {
 	}
 
 	return value, nil
+}
+
+// ParseStationName extracts the station name from an access string.
+// Example: "JR中央線/吉祥寺駅 歩8分" -> "吉祥寺"
+// Example: "東京メトロ丸ノ内線/新宿駅 歩5分" -> "新宿"
+// Returns empty string if the station name cannot be parsed.
+func ParseStationName(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" || s == "-" {
+		return ""
+	}
+
+	matches := stationRegex.FindStringSubmatch(s)
+	if len(matches) < 2 {
+		return ""
+	}
+
+	return matches[1]
 }
 
 // ExtractPropertyID extracts the property ID from a SUUMO URL.
