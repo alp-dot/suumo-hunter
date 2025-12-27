@@ -1,0 +1,29 @@
+# ===========================================
+# SUUMO Hunter - 環境設定ファイル
+# ===========================================
+# このファイルをコピーして terraform.tfvars を作成
+# cp terraform.tfvars.example terraform.tfvars
+
+# インスタンス名（必須）
+# ディレクトリ名と合わせることを推奨
+instance_name = "example"
+
+# SUUMO検索URL（必須）
+# SUUMOで検索条件を設定し、検索結果ページのURLをコピー
+suumo_search_url = "https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=030&bs=040&..."
+
+# Discord Webhook URL（必須）
+# サーバー設定 > 連携サービス > ウェブフック で作成
+discord_webhook_url = "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN"
+
+# スクレイピング最大ページ数（オプション、デフォルト: 30）
+# max_page = 30
+
+# EventBridgeスケジュール（オプション）
+# デフォルト: JST 09:15, 15:15, 18:15, 22:15
+# schedule_expression = "cron(15 0,6,9,13 * * ? *)"
+
+# IAMロール作成フラグ（オプション、デフォルト: true）
+# 1つ目のインスタンス: true
+# 2つ目以降: false（共通ロールを使用）
+# create_iam_role = true

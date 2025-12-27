@@ -70,7 +70,17 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] EventBridgeスケジュール定義（terraform/eventbridge.tf）
   - [x] terraform validate成功
 
-- [ ] Milestone 10: デプロイと検証
+- [x] (2025-12-27) Milestone 10: マルチインスタンス対応
+  - [x] instance_name変数追加（terraform/variables.tf）
+  - [x] locals.tf作成（name_prefix, common_tags定義）
+  - [x] 全リソース名にlocal.name_prefixを反映
+  - [x] IAMロール共通化（create_iam_role変数で制御）
+  - [x] S3ポリシーをワイルドカード化（全インスタンス対応）
+  - [x] タグ管理改善（Project, Instance, ManagedBy）
+  - [x] terraform.tfvars.example更新
+  - [x] terraform validate成功
+
+- [ ] Milestone 11: デプロイと検証
   - [ ] 本番デプロイ
   - [ ] 動作確認
   - [ ] Discord通知受信確認

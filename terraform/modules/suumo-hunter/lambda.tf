@@ -1,16 +1,16 @@
 # Lambda function
 resource "aws_lambda_function" "suumo_hunter" {
-  function_name = var.project_name
-  role          = aws_iam_role.lambda.arn
+  function_name = local.name_prefix
+  role          = local.lambda_role_arn
 
-  filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  filename         = var.lambda_zip_path
+  source_code_hash = filebase64sha256(var.lambda_zip_path)
 
-  handler     = "bootstrap"
-  runtime     = "provided.al2023"
+  handler       = "bootstrap"
+  runtime       = "provided.al2023"
   architectures = ["arm64"]
-  timeout     = 300
-  memory_size = 256
+  timeout       = 300
+  memory_size   = 256
 
   environment {
     variables = {
@@ -21,19 +21,16 @@ resource "aws_lambda_function" "suumo_hunter" {
       DISCORD_WEBHOOK_URL = var.discord_webhook_url
     }
   }
-}
 
-# Create zip from bootstrap binary
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_file = "${path.module}/../build/bootstrap"
-  output_path = "${path.module}/../build/lambda.zip"
+  tags = local.common_tags
 }
 
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "lambda" {
-  name              = "/aws/lambda/${var.project_name}"
+  name              = "/aws/lambda/${local.name_prefix}"
   retention_in_days = 14
+
+  tags = local.common_tags
 }
 
 # Lambda permission for EventBridge

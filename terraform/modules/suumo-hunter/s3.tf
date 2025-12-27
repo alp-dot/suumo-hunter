@@ -1,5 +1,7 @@
 resource "aws_s3_bucket" "properties" {
-  bucket = "${var.project_name}-properties-${data.aws_caller_identity.current.account_id}"
+  bucket = "${local.name_prefix}-properties-${data.aws_caller_identity.current.account_id}"
+
+  tags = local.common_tags
 }
 
 resource "aws_s3_bucket_versioning" "properties" {

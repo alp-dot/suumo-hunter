@@ -22,8 +22,8 @@ build-lambda:
 # Create deployment package
 package: build-lambda
 	@echo "Creating deployment package..."
-	cd $(BUILD_DIR) && zip -j function.zip $(BINARY_NAME)
-	@echo "Package created: $(BUILD_DIR)/function.zip"
+	cd $(BUILD_DIR) && zip -j lambda.zip $(BINARY_NAME)
+	@echo "Package created: $(BUILD_DIR)/lambda.zip"
 
 # Run linter
 lint:
@@ -48,20 +48,32 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -f coverage.out coverage.html
 
-# Deploy to AWS (build + terraform)
+# Deploy to AWS (requires ENV variable)
+# Usage: make deploy ENV=shibuya
 deploy: package
-	@echo "Deploying to AWS..."
-	cd terraform && terraform apply -auto-approve
+ifndef ENV
+	$(error ENV is required. Usage: make deploy ENV=shibuya)
+endif
+	@echo "Deploying $(ENV) to AWS..."
+	cd terraform/$(ENV) && terraform apply -auto-approve
 
-# Initialize terraform
+# Initialize terraform for an environment
+# Usage: make terraform-init ENV=shibuya
 terraform-init:
-	@echo "Initializing Terraform..."
-	cd terraform && terraform init
+ifndef ENV
+	$(error ENV is required. Usage: make terraform-init ENV=shibuya)
+endif
+	@echo "Initializing Terraform for $(ENV)..."
+	cd terraform/$(ENV) && terraform init
 
 # Plan terraform changes
+# Usage: make terraform-plan ENV=shibuya
 terraform-plan: package
-	@echo "Planning Terraform changes..."
-	cd terraform && terraform plan
+ifndef ENV
+	$(error ENV is required. Usage: make terraform-plan ENV=shibuya)
+endif
+	@echo "Planning Terraform changes for $(ENV)..."
+	cd terraform/$(ENV) && terraform plan
 
 # Format Go code
 fmt:
