@@ -6,9 +6,9 @@
 # SUUMOで検索条件を設定し、検索結果ページのURLをコピー
 suumo_search_url = "https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=030&bs=040&..."
 
-# LINE Notify Token（必須）
-# https://notify-bot.line.me/ でトークンを取得
-line_notify_token = "YOUR_LINE_NOTIFY_TOKEN"
+# Discord Webhook URL（必須）
+# Discordサーバー設定 > 連携サービス > ウェブフック で作成
+discord_webhook_url = "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN"
 
 # スクレイピング最大ページ数（オプション、デフォルト: 30）
 # max_page = 30

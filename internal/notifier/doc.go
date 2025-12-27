@@ -1,2 +1,2 @@
-// Package notifier provides LINE Notify integration for sending property alerts.
+// Package notifier provides Discord Webhook integration for sending property alerts.
 package notifier

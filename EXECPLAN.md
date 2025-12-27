@@ -8,11 +8,11 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
 
 この実装計画は、既存のPython版SUUMOスクレイパーをGoに移植し、AWS Lambda上で動作するシステムを構築することを目的とする。完成後、ユーザーは以下のことが可能になる：
 
-1. SUUMOの賃貸物件情報が定期的にスクレイピングされ、新着物件がLINE通知で受け取れる
+1. SUUMOの賃貸物件情報が定期的にスクレイピングされ、新着物件がDiscord通知で受け取れる
 2. 重回帰分析による割安度判定により、相場より安い物件を自動で発見できる
 3. AWS EventBridgeによる定期実行で、手動操作なしに継続的に物件情報を監視できる
 
-動作確認方法：Lambdaをデプロイ後、手動実行またはスケジュール実行により、LINEに新着物件通知が届くことを確認する。ローカルでは `go run cmd/lambda/main.go` でテスト実行できる（環境変数設定が必要）。
+動作確認方法：Lambdaをデプロイ後、手動実行またはスケジュール実行により、Discordに新着物件通知が届くことを確認する。ローカルでは `go run cmd/lambda/main.go` でテスト実行できる（環境変数設定が必要）。
 
 ## Progress
 
@@ -42,7 +42,7 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] ユニットテスト作成（モック使用、カバレッジ86.2%）
 
 - [x] (2025-12-27) Milestone 5: 通知機能実装
-  - [x] LINE Notifyクライアント実装（internal/notifier/line.go）
+  - [x] Discord Webhookクライアント実装（internal/notifier/discord.go）
   - [x] メッセージフォーマット（SPEC.md準拠）
   - [x] 文字数制限・分割送信（1000文字、10件上限）
   - [x] ユニットテスト作成（モック使用、カバレッジ92.6%）
@@ -73,7 +73,7 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
 - [ ] Milestone 10: デプロイと検証
   - [ ] 本番デプロイ
   - [ ] 動作確認
-  - [ ] LINE通知受信確認
+  - [ ] Discord通知受信確認
 
 ## Surprises & Discoveries
 
@@ -168,12 +168,12 @@ Milestone 4でS3ストレージ機能を実装する
 - `make test` → 全テストPASS（storage: カバレッジ86.2%）
 
 **次のステップ:**
-Milestone 5でLINE通知機能を実装する
+Milestone 5でDiscord通知機能を実装する
 
 ### Milestone 5 完了 (2025-12-27)
 
 **達成事項:**
-- LINE Notifyクライアントを実装（internal/notifier/line.go）
+- Discord Webhookクライアントを実装（internal/notifier/discord.go）
 - SPEC.md準拠のメッセージフォーマット
   - 総賃料（万円）、割安度（円/月）を表示
 - 文字数制限・分割送信（1000文字上限、10件上限）
@@ -581,12 +581,12 @@ AWS SDK for Go v2を使用する。
 
 ## Milestone 5: 通知機能実装
 
-このマイルストーンでは、LINE Notify APIを使用した通知機能を実装する。完了後、`go test ./internal/notifier/...` でテストが通過する。
+このマイルストーンでは、Discord Webhook APIを使用した通知機能を実装する。完了後、`go test ./internal/notifier/...` でテストが通過する。
 
 ### Context and Orientation
 
 SPEC.md セクション4.3およびセクション10.2に記載の通り：
-- エンドポイント: https://notify-api.line.me/api/notify
+- エンドポイント: Discord Webhook URL
 - 認証: Bearer Token
 - メソッド: POST
 - Content-Type: application/x-www-form-urlencoded
@@ -607,7 +607,7 @@ SPEC.md セクション4.3およびセクション10.2に記載の通り：
 
 ### Plan of Work
 
-1. `internal/notifier/line.go` にLINE Notifyクライアントを実装する：
+1. `internal/notifier/discord.go` にDiscord Webhookクライアントを実装する：
    - `Notifier` 構造体
    - `Notify(ctx context.Context, properties []PropertyWithScore) error`
    - メッセージフォーマット生成
@@ -615,7 +615,7 @@ SPEC.md セクション4.3およびセクション10.2に記載の通り：
 
 2. `PropertyWithScore` 型を定義する（割安度情報を含む）
 
-3. `internal/notifier/line_test.go` にユニットテストを作成する
+3. `internal/notifier/discord_test.go` にユニットテストを作成する
 
 ### Concrete Steps
 
@@ -641,7 +641,7 @@ SPEC.md セクション4.3およびセクション10.2に記載の通り：
 
 ### Interfaces and Dependencies
 
-`internal/notifier/line.go` に定義する型と関数：
+`internal/notifier/discord.go` に定義する型と関数：
 
     package notifier
 
@@ -657,7 +657,7 @@ SPEC.md セクション4.3およびセクション10.2に記載の通り：
 
     func NewNotifier(token string) *Notifier
 
-    // Notify sends LINE notification for new properties
+    // Notify sends Discord notification for new properties
     func (n *Notifier) Notify(ctx context.Context, properties []PropertyWithScore) error
 
 
@@ -759,14 +759,14 @@ SPEC.md セクション3の処理フロー：
 4. 前回データと比較して差分（新着物件）を検出
 5. 取得データに対して重回帰分析を実行し、割安度を算出
 6. 新しい物件データをS3にアップロード（CSV形式）
-7. LINE Notifyで新着物件を通知（割安度付き）
+7. Discord Webhookで新着物件を通知（割安度付き）
 
 環境変数（SPEC.md セクション7.1）：
 - BUCKET_NAME（必須）
 - BUCKET_KEY（デフォルト: properties.csv）
 - MAX_PAGE（デフォルト: 30）
 - SUUMO_SEARCH_URL（必須）
-- LINE_NOTIFY_TOKEN（必須）
+- DISCORD_WEBHOOK_URL（必須）
 
 ### Plan of Work
 
@@ -788,7 +788,7 @@ SPEC.md セクション3の処理フロー：
     # ローカルテスト（環境変数設定が必要）
     export BUCKET_NAME=your-bucket
     export SUUMO_SEARCH_URL="https://suumo.jp/..."
-    export LINE_NOTIFY_TOKEN=your-token
+    export DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
     go run cmd/lambda/main.go
 
 期待される出力（ローカル実行時）：
@@ -800,7 +800,7 @@ SPEC.md セクション3の処理フロー：
     New properties: 5
     Running regression analysis...
     Uploading data to S3...
-    Sending LINE notification...
+    Sending Discord notification...
     Done!
 
 ### Validation and Acceptance
@@ -820,7 +820,7 @@ SPEC.md セクション3の処理フロー：
         BucketKey       string `env:"BUCKET_KEY" envDefault:"properties.csv"`
         MaxPage         int    `env:"MAX_PAGE" envDefault:"30"`
         SuumoSearchURL  string `env:"SUUMO_SEARCH_URL,required"`
-        LineNotifyToken string `env:"LINE_NOTIFY_TOKEN,required"`
+        DiscordWebhookURL string `env:"DISCORD_WEBHOOK_URL,required"`
     }
 
     func Load() (*Config, error)
@@ -952,7 +952,7 @@ SPEC.md セクション2のアーキテクチャ図に基づき、以下のAWS�
 
 ## Milestone 10: デプロイと検証
 
-このマイルストーンでは、本番環境にデプロイし、実際にLINE通知が届くことを確認する。
+このマイルストーンでは、本番環境にデプロイし、実際にDiscord通知が届くことを確認する。
 
 ### Context and Orientation
 
@@ -960,17 +960,17 @@ Makefileの `deploy` ターゲットを使用してデプロイする。デプ�
 
 ### Plan of Work
 
-1. LINE Notify Tokenを取得し、環境変数またはterraform変数として設定
+1. Discord Webhook URLを取得し、環境変数またはterraform変数として設定
 2. `make deploy` でビルドとデプロイを実行
 3. AWS ConsoleまたはCLIからLambdaを手動実行
-4. LINE通知が届くことを確認
+4. Discord通知が届くことを確認
 
 ### Concrete Steps
 
 作業ディレクトリ: `/Users/alp/Projects/alp-dot/suumo-hunter-go`
 
-    # LINE_NOTIFY_TOKENを設定（事前に https://notify-bot.line.me/ で取得）
-    export TF_VAR_line_notify_token="your-token"
+    # DISCORD_WEBHOOK_URLを設定（Discordサーバー設定 > 連携サービス > ウェブフック で取得）
+    export TF_VAR_discord_webhook_url="https://discord.com/api/webhooks/..."
 
     # デプロイ
     make deploy
@@ -988,7 +988,7 @@ Makefileの `deploy` ターゲットを使用してデプロイする。デプ�
         "ExecutedVersion": "$LATEST"
     }
 
-LINE通知が届き、以下のような内容が表示される：
+Discord通知が届き、以下のような内容が表示される：
 
     🏠 新着物件のお知らせ
 
@@ -1000,7 +1000,7 @@ LINE通知が届き、以下のような内容が表示される：
 
 1. Lambda関数が正常にデプロイされる
 2. 手動実行でエラーが発生しない
-3. LINE通知が正しいフォーマットで届く
+3. Discord通知が正しいフォーマットで届く
 4. S3にCSVファイルが保存される
 5. CloudWatch Logsにログが出力される
 

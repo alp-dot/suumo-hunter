@@ -1,23 +1,21 @@
-// Package notifier provides LINE Notify integration for sending property alerts.
+// Package notifier provides Discord Webhook integration for sending property alerts.
 package notifier
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/alp/suumo-hunter-go/internal/models"
 )
 
 const (
-	// LineNotifyAPI is the LINE Notify API endpoint.
-	LineNotifyAPI = "https://notify-api.line.me/api/notify"
-
-	// MaxMessageLength is the maximum length of a single LINE message.
-	MaxMessageLength = 1000
+	// MaxMessageLength is the maximum length of a single Discord message.
+	MaxMessageLength = 2000
 
 	// MaxPropertiesPerNotification is the maximum number of properties to include in one notification.
 	MaxPropertiesPerNotification = 10
@@ -62,11 +60,15 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// Notifier sends notifications via LINE Notify.
+// discordPayload is the JSON payload for Discord Webhook.
+type discordPayload struct {
+	Content string `json:"content"`
+}
+
+// Notifier sends notifications via Discord Webhook.
 type Notifier struct {
-	token  string
-	client HTTPClient
-	apiURL string
+	webhookURL string
+	client     HTTPClient
 }
 
 // Option is a function that configures a Notifier.
@@ -79,19 +81,11 @@ func WithHTTPClient(c HTTPClient) Option {
 	}
 }
 
-// WithAPIURL sets a custom API URL (for testing).
-func WithAPIURL(url string) Option {
-	return func(n *Notifier) {
-		n.apiURL = url
-	}
-}
-
-// NewNotifier creates a new Notifier with the given token.
-func NewNotifier(token string, opts ...Option) *Notifier {
+// NewNotifier creates a new Notifier with the given Discord webhook URL.
+func NewNotifier(webhookURL string, opts ...Option) *Notifier {
 	n := &Notifier{
-		token:  token,
-		client: http.DefaultClient,
-		apiURL: LineNotifyAPI,
+		webhookURL: webhookURL,
+		client:     http.DefaultClient,
 	}
 
 	for _, opt := range opts {
@@ -127,7 +121,7 @@ func (n *Notifier) formatMessages(properties []PropertyWithScore) []string {
 	var currentMsg strings.Builder
 
 	// Header
-	currentMsg.WriteString("\n🏠 新着物件のお知らせ\n")
+	currentMsg.WriteString("🏠 **新着物件のお知らせ**\n")
 
 	// Limit to MaxPropertiesPerNotification
 	displayProps := properties
@@ -145,7 +139,7 @@ func (n *Notifier) formatMessages(properties []PropertyWithScore) []string {
 			// Save current message and start a new one
 			messages = append(messages, currentMsg.String())
 			currentMsg.Reset()
-			currentMsg.WriteString("\n🏠 新着物件のお知らせ（続き）\n")
+			currentMsg.WriteString("🏠 **新着物件のお知らせ（続き）**\n")
 		}
 
 		currentMsg.WriteString(entry)
@@ -174,7 +168,7 @@ func (n *Notifier) formatPropertyEntry(prop PropertyWithScore) string {
 	var sb strings.Builder
 
 	// Property name
-	sb.WriteString(fmt.Sprintf("\n■ %s\n", prop.Property.Name))
+	sb.WriteString(fmt.Sprintf("\n**■ %s**\n", prop.Property.Name))
 
 	// Address
 	sb.WriteString(fmt.Sprintf("📍 %s\n", prop.Property.Address))
@@ -198,18 +192,20 @@ func (n *Notifier) formatPropertyEntry(prop PropertyWithScore) string {
 	return sb.String()
 }
 
-// send sends a message to LINE Notify.
+// send sends a message to Discord Webhook.
 func (n *Notifier) send(ctx context.Context, message string) error {
-	data := url.Values{}
-	data.Set("message", message)
+	payload := discordPayload{Content: message}
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal payload: %w", err)
+	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, n.apiURL, strings.NewReader(data.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, n.webhookURL, bytes.NewReader(jsonData))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bearer "+n.token)
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := n.client.Do(req)
 	if err != nil {
@@ -217,9 +213,10 @@ func (n *Notifier) send(ctx context.Context, message string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	// Discord returns 204 No Content on success
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("LINE Notify returned status %d: %s", resp.StatusCode, string(body))
+		return fmt.Errorf("Discord Webhook returned status %d: %s", resp.StatusCode, string(body))
 	}
 
 	return nil

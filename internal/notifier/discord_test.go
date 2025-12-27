@@ -21,7 +21,7 @@ func (m *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 		return m.doFunc(req)
 	}
 	return &http.Response{
-		StatusCode: http.StatusOK,
+		StatusCode: http.StatusNoContent,
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil
 }
@@ -89,13 +89,13 @@ func TestNotify(t *testing.T) {
 			body, _ := io.ReadAll(req.Body)
 			capturedBodies = append(capturedBodies, string(body))
 			return &http.Response{
-				StatusCode: http.StatusOK,
+				StatusCode: http.StatusNoContent,
 				Body:       io.NopCloser(bytes.NewReader([]byte{})),
 			}, nil
 		},
 	}
 
-	notifier := NewNotifier("test-token", WithHTTPClient(mock))
+	notifier := NewNotifier("https://discord.com/api/webhooks/test", WithHTTPClient(mock))
 	ctx := context.Background()
 
 	properties := []PropertyWithScore{
@@ -125,25 +125,18 @@ func TestNotify(t *testing.T) {
 
 	req := capturedRequests[0]
 
-	// Verify authorization header
-	auth := req.Header.Get("Authorization")
-	if auth != "Bearer test-token" {
-		t.Errorf("Authorization header = %q, want %q", auth, "Bearer test-token")
-	}
-
 	// Verify content type
 	contentType := req.Header.Get("Content-Type")
-	if contentType != "application/x-www-form-urlencoded" {
-		t.Errorf("Content-Type = %q, want %q", contentType, "application/x-www-form-urlencoded")
+	if contentType != "application/json" {
+		t.Errorf("Content-Type = %q, want %q", contentType, "application/json")
 	}
 
-	// Verify message content
+	// Verify message content (JSON body)
 	body := capturedBodies[0]
-	if !strings.Contains(body, "message=") {
-		t.Error("Request body should contain message parameter")
+	if !strings.Contains(body, `"content"`) {
+		t.Error("Request body should contain content field")
 	}
-	if !strings.Contains(body, "%E3%83%86%E3%82%B9%E3%83%88%E3%83%9E%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%B3") {
-		// URL encoded "テストマンション"
+	if !strings.Contains(body, "テストマンション") {
 		t.Error("Request body should contain property name")
 	}
 }
@@ -156,7 +149,7 @@ func TestNotifyEmptyProperties(t *testing.T) {
 		},
 	}
 
-	notifier := NewNotifier("test-token", WithHTTPClient(mock))
+	notifier := NewNotifier("https://discord.com/api/webhooks/test", WithHTTPClient(mock))
 	ctx := context.Background()
 
 	err := notifier.Notify(ctx, []PropertyWithScore{})
@@ -172,13 +165,13 @@ func TestNotifyWithManyProperties(t *testing.T) {
 		doFunc: func(req *http.Request) (*http.Response, error) {
 			requestCount++
 			return &http.Response{
-				StatusCode: http.StatusOK,
+				StatusCode: http.StatusNoContent,
 				Body:       io.NopCloser(bytes.NewReader([]byte{})),
 			}, nil
 		},
 	}
 
-	notifier := NewNotifier("test-token", WithHTTPClient(mock))
+	notifier := NewNotifier("https://discord.com/api/webhooks/test", WithHTTPClient(mock))
 	ctx := context.Background()
 
 	// Create 15 properties (more than MaxPropertiesPerNotification)
@@ -214,12 +207,12 @@ func TestNotifyError(t *testing.T) {
 		doFunc: func(req *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusUnauthorized,
-				Body:       io.NopCloser(bytes.NewReader([]byte("invalid token"))),
+				Body:       io.NopCloser(bytes.NewReader([]byte("invalid webhook"))),
 			}, nil
 		},
 	}
 
-	notifier := NewNotifier("invalid-token", WithHTTPClient(mock))
+	notifier := NewNotifier("https://discord.com/api/webhooks/invalid", WithHTTPClient(mock))
 	ctx := context.Background()
 
 	properties := []PropertyWithScore{
@@ -239,7 +232,7 @@ func TestNotifyError(t *testing.T) {
 }
 
 func TestFormatPropertyEntry(t *testing.T) {
-	notifier := NewNotifier("test-token")
+	notifier := NewNotifier("https://discord.com/api/webhooks/test")
 
 	tests := []struct {
 		name     string
@@ -259,7 +252,7 @@ func TestFormatPropertyEntry(t *testing.T) {
 				Score: 12800,
 				Label: ScoreLabelBargain,
 			},
-			contains: []string{"■ お得マンション", "8.4万円", "12800円/月 お得"},
+			contains: []string{"お得マンション", "8.4万円", "12800円/月 お得"},
 		},
 		{
 			name: "expensive property",
@@ -274,7 +267,7 @@ func TestFormatPropertyEntry(t *testing.T) {
 				Score: -15000,
 				Label: ScoreLabelExpensive,
 			},
-			contains: []string{"■ 高いマンション", "16.0万円", "15000円/月 高い"},
+			contains: []string{"高いマンション", "16.0万円", "15000円/月 高い"},
 		},
 		{
 			name: "analyzing property",
@@ -289,7 +282,7 @@ func TestFormatPropertyEntry(t *testing.T) {
 				Score: 0,
 				Label: ScoreLabelAnalyzing,
 			},
-			contains: []string{"■ 分析中マンション", "10.5万円"},
+			contains: []string{"分析中マンション", "10.5万円"},
 		},
 	}
 
@@ -329,17 +322,17 @@ func TestConvertToPropertyWithScore(t *testing.T) {
 }
 
 func TestMessageSplitting(t *testing.T) {
-	notifier := NewNotifier("test-token")
+	notifier := NewNotifier("https://discord.com/api/webhooks/test")
 
 	// Create properties with long names to force message splitting
 	properties := make([]PropertyWithScore, 5)
 	for i := range 5 {
 		properties[i] = PropertyWithScore{
 			Property: models.Property{
-				Name:    strings.Repeat("あ", 100), // Long name
-				Address: strings.Repeat("い", 50),
+				Name:    strings.Repeat("あ", 200), // Long name
+				Address: strings.Repeat("い", 100),
 				Rent:    80000,
-				URL:     "https://suumo.jp/" + strings.Repeat("x", 50),
+				URL:     "https://suumo.jp/" + strings.Repeat("x", 100),
 			},
 			Score: 5000,
 			Label: ScoreLabelStandard,

@@ -15,8 +15,8 @@ variable "suumo_search_url" {
   type        = string
 }
 
-variable "line_notify_token" {
-  description = "LINE Notify API token"
+variable "discord_webhook_url" {
+  description = "Discord Webhook URL for notifications"
   type        = string
   sensitive   = true
 }

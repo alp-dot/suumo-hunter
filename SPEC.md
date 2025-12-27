@@ -2,7 +2,7 @@
 
 ## 1. 概要
 
-SUUMOの賃貸物件情報を定期的にスクレイピングし、新着物件を検出してLINE通知するシステム。
+SUUMOの賃貸物件情報を定期的にスクレイピングし、新着物件を検出してDiscord通知するシステム。
 重回帰分析による割安度判定機能を備え、お得な物件を自動で発見する。
 
 ## 2. システムアーキテクチャ
@@ -17,12 +17,12 @@ SUUMOの賃貸物件情報を定期的にスクレイピングし、新着物件
 │  │  (Cron)     │      │  (Go ARM64) │      │  (CSV保存)  │     │
 │  └─────────────┘      └──────┬──────┘      └─────────────┘     │
 │                              │                                  │
-│                              ├─── 環境変数: LINE_NOTIFY_TOKEN   │
+│                              ├─── 環境変数: DISCORD_WEBHOOK_URL │
 │                              │                                  │
 │                              ▼                                  │
 │            ┌─────────────┐       ┌─────────────┐               │
-│            │ LINE Notify │       │ CloudWatch  │               │
-│            │    API      │       │    Logs     │               │
+│            │   Discord   │       │ CloudWatch  │               │
+│            │   Webhook   │       │    Logs     │               │
 │            └─────────────┘       └─────────────┘               │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -35,7 +35,7 @@ SUUMOの賃貸物件情報を定期的にスクレイピングし、新着物件
 4. 前回データと比較して差分（新着物件）を検出
 5. 取得データに対して重回帰分析を実行し、割安度を算出
 6. 新しい物件データをS3にアップロード（CSV形式）
-7. LINE Notifyで新着物件を通知（割安度付き）
+7. Discord Webhookで新着物件を通知（割安度付き）
 
 ## 4. 機能要件
 
@@ -100,24 +100,24 @@ SUUMOの賃貸物件一覧ページから以下の情報を取得する。
 
 ### 4.3 通知機能
 
-LINE Notify APIを使用して以下の形式で通知する。
+Discord Webhook APIを使用して以下の形式で通知する。
 
 ```
-🏠 新着物件のお知らせ
+🏠 **新着物件のお知らせ**
 
-▫️マンション名A
+**■ マンション名A**
 📍 東京都渋谷区...
 💰 8.5万円（管理費込）
 💴 相場より 12,800円/月 お得！
 🔗 https://suumo.jp/...
 
-▫️マンション名B
+**■ マンション名B**
 📍 東京都新宿区...
 💰 9.0万円（管理費込）
 💴 相場より 2,100円/月 お得
 🔗 https://suumo.jp/...
 
-▫️マンション名C
+**■ マンション名C**
 📍 東京都目黒区...
 💰 10.5万円（管理費込）
 💴 相場より 8,500円/月 高い
@@ -127,7 +127,7 @@ LINE Notify APIを使用して以下の形式で通知する。
 #### 通知の制限
 
 - 1回の通知上限: 10件（超過分は「他N件の新着あり」と要約）
-- メッセージ長制限: 1000文字を超える場合は分割送信
+- メッセージ長制限: 2000文字を超える場合は分割送信
 
 ### 4.4 データ永続化
 
@@ -147,11 +147,11 @@ LINE Notify APIを使用して以下の形式で通知する。
 
 - スクレイピングエラー: 3回リトライ後も失敗した場合はCloudWatch Logsにエラー記録し終了
 - S3書き込み失敗: 通知は行わず、次回実行時に再試行
-- LINE通知失敗: CloudWatch Logsに記録し、処理は継続（データは保存）
+- Discord通知失敗: CloudWatch Logsに記録し、処理は継続（データは保存）
 
 ### 5.3 セキュリティ
 
-- LINE Notify Token: 環境変数
+- Discord Webhook URL: 環境変数
 - IAMロール: 最小権限の原則
 
 ### 5.4 可用性
@@ -173,7 +173,7 @@ LINE Notify APIを使用して以下の形式で通知する。
   - `internal/analyzer` - 重回帰分析、お得度計算
   - `internal/models` - データ変換、バリデーション
   - `internal/storage` - S3操作（モックを使用）
-  - `internal/notifier` - LINE通知（モックを使用）
+  - `internal/notifier` - Discord通知（モックを使用）
 - カバレッジ目標: 主要ロジック80%以上
 
 #### CI
@@ -201,7 +201,7 @@ suumo-hunter-go/
 │   ├── storage/
 │   │   └── s3.go                # S3操作
 │   ├── notifier/
-│   │   └── line.go              # LINE通知
+│   │   └── discord.go           # Discord通知
 │   ├── analyzer/
 │   │   └── regression.go        # 重回帰分析・割安度判定
 │   └── models/
@@ -235,7 +235,7 @@ suumo-hunter-go/
 | BUCKET_KEY | CSVファイルのキー | - (default: properties.csv) |
 | MAX_PAGE | スクレイピング最大ページ数 | - (default: 30) |
 | SUUMO_SEARCH_URL | SUUMO検索URL | ✓ |
-| LINE_NOTIFY_TOKEN | LINE Notify APIトークン | ✓ |
+| DISCORD_WEBHOOK_URL | Discord Webhook URL | ✓ |
 
 ## 8. 依存ライブラリ
 
@@ -264,7 +264,7 @@ suumo-hunter-go/
 - [ ] 物件データ構造体定義
 - [ ] スクレイピング機能 (goquery)
 - [ ] S3操作 (aws-sdk-go-v2)
-- [ ] LINE通知機能
+- [ ] Discord通知機能
 - [ ] Lambdaハンドラ実装
 
 ### Phase 2: インフラ整備
@@ -305,9 +305,11 @@ https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=030&bs=040&pc=20&smk=&po1=25&
 | ek | 駅コード | 035001440 (新井薬師前) |
 | page | ページ番号 | 1〜 |
 
-### 10.2 LINE Notify API
+### 10.2 Discord Webhook API
 
-- エンドポイント: `https://notify-api.line.me/api/notify`
-- 認証: Bearer Token
+- エンドポイント: `https://discord.com/api/webhooks/{webhook.id}/{webhook.token}`
+- 認証: URLに含まれる（トークン不要）
 - メソッド: POST
-- Content-Type: application/x-www-form-urlencoded
+- Content-Type: application/json
+- ボディ: `{"content": "メッセージ"}`
+- 文字数制限: 2000文字

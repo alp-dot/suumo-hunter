@@ -21,8 +21,8 @@ type Config struct {
 	// SuumoSearchURL is the SUUMO search result URL to scrape.
 	SuumoSearchURL string `env:"SUUMO_SEARCH_URL,required"`
 
-	// LineNotifyToken is the LINE Notify API token.
-	LineNotifyToken string `env:"LINE_NOTIFY_TOKEN,required"`
+	// DiscordWebhookURL is the Discord Webhook URL for notifications.
+	DiscordWebhookURL string `env:"DISCORD_WEBHOOK_URL,required"`
 }
 
 // Load loads configuration from environment variables.

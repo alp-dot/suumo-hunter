@@ -44,7 +44,7 @@ func Handler(ctx context.Context) error {
 	// Initialize components
 	store := storage.NewStorage(s3Client, cfg.BucketName, cfg.BucketKey)
 	scrp := scraper.NewScraper(cfg.SuumoSearchURL, scraper.WithMaxPages(cfg.MaxPage))
-	notify := notifier.NewNotifier(cfg.LineNotifyToken)
+	notify := notifier.NewNotifier(cfg.DiscordWebhookURL)
 	analyze := analyzer.NewAnalyzer()
 
 	// Step 1: Download previous data from S3

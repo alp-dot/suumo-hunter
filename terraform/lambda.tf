@@ -14,11 +14,11 @@ resource "aws_lambda_function" "suumo_hunter" {
 
   environment {
     variables = {
-      BUCKET_NAME       = aws_s3_bucket.properties.id
-      BUCKET_KEY        = "properties.csv"
-      MAX_PAGE          = tostring(var.max_page)
-      SUUMO_SEARCH_URL  = var.suumo_search_url
-      LINE_NOTIFY_TOKEN = var.line_notify_token
+      BUCKET_NAME         = aws_s3_bucket.properties.id
+      BUCKET_KEY          = "properties.csv"
+      MAX_PAGE            = tostring(var.max_page)
+      SUUMO_SEARCH_URL    = var.suumo_search_url
+      DISCORD_WEBHOOK_URL = var.discord_webhook_url
     }
   }
 }
