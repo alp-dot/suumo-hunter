@@ -1,0 +1,37 @@
+{
+    "result_url": "https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=030&bs=040&pc=20&smk=&po1=25&po2=99&shkr1=03&shkr2=03&shkr3=03&shkr4=03&rn=0350&ek=035001440&ra=013&cb=0.0&ct=11.0&co=1&et=9999999&mb=0&mt=9999999&cn=20&fw2=&page=",
+    "max_page": 30,
+    "bucket_name": "YOUR_BUCKET_NAME",
+    "bucket_key": "YOUR_BUCKET_KEY",
+    "header": [
+        "name",
+        "adress",
+        "age",
+        "floor",
+        "家賃",
+        "管理費",
+        "敷金",
+        "礼金",
+        "layout",
+        "house_area",
+        "url",
+        "id"
+    ],
+    "suumo_url": "https://suumo.jp",
+    "line_notify_token": "YOUR_LINE_NOTIFY_TOKEN",
+    "line_notify_api": "https://notify-api.line.me/api/notify",
+    "dtype": {
+        "name": "object",
+        "adress": "object",
+        "age": "object",
+        "floor": "object",
+        "家賃": "object",
+        "管理費": "object",
+        "敷金": "object",
+        "礼金": "object",
+        "layout": "object",
+        "house_area": "object",
+        "url": "object",
+        "id": "object"
+      }
+}
