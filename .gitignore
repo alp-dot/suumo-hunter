@@ -1,0 +1,45 @@
+# Build artifacts
+build/
+*.zip
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+**/terraform.tfvars
+.terraform.lock.hcl
+
+# Terraform environments (except _example and modules)
+terraform/nakano/
+terraform/kichijoji/
+# terraform/shibuya/
+# terraform/shinjuku/
+
+# Environment
+.env
+.env.local
