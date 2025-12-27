@@ -17,13 +17,13 @@ SUUMOの賃貸物件を自動でスクレイピングし、新着物件をDiscor
 
 - [Go](https://golang.org/) 1.22+
 - [Terraform](https://www.terraform.io/) 1.0+
-- [AWS CLI](https://aws.amazon.com/cli/) v2（設定済み）
+- [AWS CLI](https://aws.amazon.com/cli/) v2
 - Discord サーバー（通知先）
 
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/your-username/suumo-hunter.git
+git clone https://github.com/alp-dot/suumo-hunter.git
 cd suumo-hunter
 ```
 
@@ -177,9 +177,10 @@ EventBridge (cron) → Lambda (Go) → S3 (CSV保存)
 
 ## ドキュメント
 
-- [アーキテクチャ](docs/ARCHITECTURE.md) - システム構成詳細
-- [重回帰分析](docs/ANALYSIS.md) - 割安度判定の仕組み
-- [仕様書](SPEC.md) - 詳細な技術仕様
+- [アーキテクチャ](docs/アーキテクチャ設計書.md) - システム構成詳細
+- [AWS Consoleセットアップ](docs/AWS_CONSOLE_SETUP.md) - ブラウザからの設定方法（初心者向け）
+- [重回帰分析](docs/分析機能設計書.md) - 割安度判定の仕組み
+- [システム仕様書](docs/システム仕様書.md) - 詳細な技術仕様
 - [Terraform](terraform/README.md) - インフラ構築詳細
 
 ## ライセンス
