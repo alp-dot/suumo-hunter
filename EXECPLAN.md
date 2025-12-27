@@ -36,10 +36,10 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] リトライ処理（指数バックオフ、retry-go使用）
   - [x] ユニットテスト作成（カバレッジ94.6%）
 
-- [ ] Milestone 4: ストレージ機能実装
-  - [ ] S3クライアント実装（internal/storage/s3.go）
-  - [ ] CSVアップロード/ダウンロード
-  - [ ] ユニットテスト作成（モック使用）
+- [x] (2025-12-27) Milestone 4: ストレージ機能実装
+  - [x] S3クライアント実装（internal/storage/s3.go）
+  - [x] CSVアップロード/ダウンロード
+  - [x] ユニットテスト作成（モック使用、カバレッジ86.2%）
 
 - [ ] Milestone 5: 通知機能実装
   - [ ] LINE Notifyクライアント実装（internal/notifier/line.go）
@@ -153,6 +153,22 @@ Milestone 3でSUUMOスクレイピング機能を実装する
 
 **次のステップ:**
 Milestone 4でS3ストレージ機能を実装する
+
+### Milestone 4 完了 (2025-12-27)
+
+**達成事項:**
+- S3ストレージクライアントを実装（internal/storage/s3.go）
+- S3APIインターフェースを定義（モックテスト対応）
+- CSVダウンロード機能（NoSuchKeyエラー時は空配列を返す）
+- CSVアップロード機能（Content-Type設定）
+- モックを使用した包括的なユニットテスト
+
+**検証結果:**
+- `make lint` → エラーなし
+- `make test` → 全テストPASS（storage: カバレッジ86.2%）
+
+**次のステップ:**
+Milestone 5でLINE通知機能を実装する
 
 
 ---
