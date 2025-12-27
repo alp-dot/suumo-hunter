@@ -62,13 +62,13 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] GitHub Actions設定（.github/workflows/ci.yml）
   - [x] lint + test + buildパイプライン
 
-- [ ] Milestone 9: インフラ構築
-  - [ ] Terraform初期化
-  - [ ] S3バケット定義
-  - [ ] Lambda関数定義
-  - [ ] IAMロール・ポリシー定義
-  - [ ] EventBridgeスケジュール定義
-  - [ ] terraform plan確認
+- [x] (2025-12-27) Milestone 9: インフラ構築
+  - [x] Terraform初期化（terraform init成功）
+  - [x] S3バケット定義（terraform/s3.tf）
+  - [x] Lambda関数定義（terraform/lambda.tf）
+  - [x] IAMロール・ポリシー定義（terraform/iam.tf）
+  - [x] EventBridgeスケジュール定義（terraform/eventbridge.tf）
+  - [x] terraform validate成功
 
 - [ ] Milestone 10: デプロイと検証
   - [ ] 本番デプロイ
