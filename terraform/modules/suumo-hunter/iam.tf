@@ -66,6 +66,13 @@ resource "aws_iam_role_policy" "lambda_s3" {
           "s3:PutObject"
         ]
         Resource = "arn:aws:s3:::${var.project_name}-*-properties-*/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = "arn:aws:s3:::${var.project_name}-*-properties-*"
       }
     ]
   })
