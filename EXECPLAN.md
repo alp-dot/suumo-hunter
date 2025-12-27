@@ -41,11 +41,11 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] CSVアップロード/ダウンロード
   - [x] ユニットテスト作成（モック使用、カバレッジ86.2%）
 
-- [ ] Milestone 5: 通知機能実装
-  - [ ] LINE Notifyクライアント実装（internal/notifier/line.go）
-  - [ ] メッセージフォーマット
-  - [ ] 文字数制限・分割送信
-  - [ ] ユニットテスト作成（モック使用）
+- [x] (2025-12-27) Milestone 5: 通知機能実装
+  - [x] LINE Notifyクライアント実装（internal/notifier/line.go）
+  - [x] メッセージフォーマット（SPEC.md準拠）
+  - [x] 文字数制限・分割送信（1000文字、10件上限）
+  - [x] ユニットテスト作成（モック使用、カバレッジ92.6%）
 
 - [ ] Milestone 6: 分析機能実装
   - [ ] 重回帰分析実装（internal/analyzer/regression.go）
@@ -169,6 +169,25 @@ Milestone 4でS3ストレージ機能を実装する
 
 **次のステップ:**
 Milestone 5でLINE通知機能を実装する
+
+### Milestone 5 完了 (2025-12-27)
+
+**達成事項:**
+- LINE Notifyクライアントを実装（internal/notifier/line.go）
+- SPEC.md準拠のメッセージフォーマット
+  - お買い得（🔥）、標準（😐）、割高（💸）、分析中（🔍）のラベル表示
+  - 総賃料（万円）、割安度（円/月）を表示
+- 文字数制限・分割送信（1000文字上限、10件上限）
+- HTTPClientインターフェースによるモック対応
+- PropertyWithScore型の定義
+- ConvertToPropertyWithScoreヘルパー関数
+
+**検証結果:**
+- `make lint` → エラーなし
+- `make test` → 全テストPASS（notifier: カバレッジ92.6%）
+
+**次のステップ:**
+Milestone 6で重回帰分析機能を実装する
 
 
 ---
