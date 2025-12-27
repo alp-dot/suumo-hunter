@@ -1,20 +1,21 @@
 module github.com/alp/suumo-hunter
 
-go 1.25.5
+go 1.23.0
 
 require (
-	github.com/PuerkitoBio/goquery v1.11.0
+	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/avast/retry-go/v4 v4.7.0
+	github.com/aws/aws-lambda-go v1.51.1
 	github.com/aws/aws-sdk-go-v2 v1.41.0
+	github.com/aws/aws-sdk-go-v2/config v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0
+	github.com/caarlos0/env/v11 v11.3.1
 	gonum.org/v1/gonum v0.16.0
 )
 
 require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
-	github.com/aws/aws-lambda-go v1.51.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.4 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.32.6 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.6 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.16 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.16 // indirect
@@ -30,6 +31,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.5 // indirect
 	github.com/aws/smithy-go v1.24.0 // indirect
-	github.com/caarlos0/env/v11 v11.3.1 // indirect
-	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 )
