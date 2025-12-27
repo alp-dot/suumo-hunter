@@ -31,6 +31,7 @@ terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/*.tfplan
+terraform/terraform.tfvars
 
 # Environment
 .env

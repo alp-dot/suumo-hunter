@@ -30,5 +30,5 @@ variable "max_page" {
 variable "schedule_expression" {
   description = "EventBridge schedule expression (cron or rate)"
   type        = string
-  default     = "rate(1 hour)"
+  default     = "cron(15 0,6,9,13 * * ? *)" # JST 09:15, 15:15, 18:15, 22:15
 }
