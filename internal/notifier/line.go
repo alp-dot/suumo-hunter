@@ -202,17 +202,9 @@ func (n *Notifier) formatPropertyEntry(prop PropertyWithScore) string {
 }
 
 // getLabelIcon returns the emoji icon for a score label.
-func (n *Notifier) getLabelIcon(label ScoreLabel) string {
-	switch label {
-	case ScoreLabelBargain:
-		return "🔥"
-	case ScoreLabelExpensive:
-		return "💸"
-	case ScoreLabelAnalyzing:
-		return "🔍"
-	default:
-		return "😐"
-	}
+// Using a unified icon for cleaner appearance.
+func (n *Notifier) getLabelIcon(_ ScoreLabel) string {
+	return "🏠"
 }
 
 // send sends a message to LINE Notify.
