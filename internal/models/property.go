@@ -67,7 +67,7 @@ var (
 
 	// stationRegex matches patterns like "JR中央線/吉祥寺駅 歩8分", "東京メトロ丸ノ内線/新宿駅 歩5分"
 	// Captures the station name (e.g., "吉祥寺", "新宿")
-	stationRegex = regexp.MustCompile(`(?:/|線)?([^/\s]+?)駅`)
+	stationRegex = regexp.MustCompile(`[/線]?([^/\s]+?)駅`)
 )
 
 // ParseRent converts a rent string to yen.

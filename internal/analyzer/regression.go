@@ -58,14 +58,14 @@ func extractStations(properties []models.Property) []string {
 
 // buildStationIndex creates a mapping from station name to dummy variable index.
 // The first station is excluded as the reference category to avoid multicollinearity.
-func buildStationIndex(stations []string) ([]string, map[string]int) {
+func buildStationIndex(stations []string) (dummyStations []string, index map[string]int) {
 	if len(stations) <= 1 {
 		return nil, nil
 	}
 
 	// Skip the first station (reference category)
-	dummyStations := stations[1:]
-	index := make(map[string]int)
+	dummyStations = stations[1:]
+	index = make(map[string]int)
 	for i, station := range dummyStations {
 		index[station] = i
 	}
