@@ -428,14 +428,17 @@ func TestLoadFromCSVEmpty(t *testing.T) {
 }
 
 func TestFindNewProperties(t *testing.T) {
+	// UniqueKey is based on: address|area|layout|floor
 	previous := []Property{
-		{ID: "jnc_001"},
-		{ID: "jnc_002"},
+		{ID: "jnc_001", Address: "東京都渋谷区1", Area: 25.0, Layout: "1K", Floor: 1},
+		{ID: "jnc_002", Address: "東京都渋谷区2", Area: 30.0, Layout: "1LDK", Floor: 2},
 	}
 	current := []Property{
-		{ID: "jnc_002"},
-		{ID: "jnc_003"},
-		{ID: "jnc_004"},
+		// Same UniqueKey as jnc_002 (different ID but same property)
+		{ID: "jnc_002_new", Address: "東京都渋谷区2", Area: 30.0, Layout: "1LDK", Floor: 2},
+		// New properties
+		{ID: "jnc_003", Address: "東京都新宿区1", Area: 28.0, Layout: "1K", Floor: 3},
+		{ID: "jnc_004", Address: "東京都新宿区2", Area: 35.0, Layout: "2K", Floor: 4},
 	}
 
 	newProps := FindNewProperties(current, previous)
@@ -452,14 +455,34 @@ func TestFindNewProperties(t *testing.T) {
 	}
 }
 
-func TestMergeProperties(t *testing.T) {
+func TestFindNewPropertiesSameIDDifferentUniqueKey(t *testing.T) {
+	// Test that properties with same ID but different UniqueKey are treated as different
 	previous := []Property{
-		{ID: "jnc_001", Name: "Old1"},
-		{ID: "jnc_002", Name: "Old2"},
+		{ID: "jnc_001", Address: "東京都渋谷区1", Area: 25.0, Layout: "1K"},
 	}
 	current := []Property{
-		{ID: "jnc_002", Name: "New2"},
-		{ID: "jnc_003", Name: "New3"},
+		// Same ID but different area (different room in same building)
+		{ID: "jnc_001", Address: "東京都渋谷区1", Area: 30.0, Layout: "1K"},
+	}
+
+	newProps := FindNewProperties(current, previous)
+
+	if len(newProps) != 1 {
+		t.Fatalf("FindNewProperties() returned %d properties, want 1", len(newProps))
+	}
+}
+
+func TestMergeProperties(t *testing.T) {
+	// UniqueKey is based on: address|area|layout|floor
+	previous := []Property{
+		{ID: "jnc_001", Name: "Old1", Address: "東京都渋谷区1", Area: 25.0, Layout: "1K", Floor: 1},
+		{ID: "jnc_002", Name: "Old2", Address: "東京都渋谷区2", Area: 30.0, Layout: "1LDK", Floor: 2},
+	}
+	current := []Property{
+		// Same UniqueKey as jnc_002 (different ID but same property) - should replace
+		{ID: "jnc_002_new", Name: "New2", Address: "東京都渋谷区2", Area: 30.0, Layout: "1LDK", Floor: 2},
+		// New property
+		{ID: "jnc_003", Name: "New3", Address: "東京都新宿区1", Area: 28.0, Layout: "1K", Floor: 3},
 	}
 
 	merged := MergeProperties(current, previous)
@@ -468,10 +491,31 @@ func TestMergeProperties(t *testing.T) {
 		t.Fatalf("MergeProperties() returned %d properties, want 3", len(merged))
 	}
 
-	// Check that current properties take precedence
+	// Check that current properties take precedence for same UniqueKey
 	for _, p := range merged {
-		if p.ID == "jnc_002" && p.Name != "New2" {
-			t.Errorf("MergeProperties() should prefer current for ID jnc_002, got Name=%s", p.Name)
+		if p.Address == "東京都渋谷区2" && p.Name != "New2" {
+			t.Errorf("MergeProperties() should prefer current for same UniqueKey, got Name=%s", p.Name)
 		}
+	}
+}
+
+func TestUniqueKey(t *testing.T) {
+	p1 := Property{Address: "東京都渋谷区", Area: 25.5, Layout: "1K", Floor: 3}
+	p2 := Property{Address: "東京都渋谷区", Area: 25.5, Layout: "1K", Floor: 5}
+	p3 := Property{Address: "東京都渋谷区", Area: 30.0, Layout: "1K", Floor: 3}
+
+	// Same address, area, layout should have same UniqueKey (floor is ignored)
+	if p1.UniqueKey() != p2.UniqueKey() {
+		t.Errorf("Same address/area/layout should have same UniqueKey: %s vs %s", p1.UniqueKey(), p2.UniqueKey())
+	}
+
+	// Different area should have different UniqueKey
+	if p1.UniqueKey() == p3.UniqueKey() {
+		t.Errorf("Different area should have different UniqueKey: %s vs %s", p1.UniqueKey(), p3.UniqueKey())
+	}
+
+	expected := "東京都渋谷区|25.50|1K"
+	if p1.UniqueKey() != expected {
+		t.Errorf("UniqueKey() = %s, want %s", p1.UniqueKey(), expected)
 	}
 }

@@ -95,7 +95,7 @@ func NewScraper(baseURL string, opts ...Option) *Scraper {
 // It paginates through the search results up to maxPages.
 func (s *Scraper) Scrape(ctx context.Context) ([]models.Property, error) {
 	var allProperties []models.Property
-	seenIDs := make(map[string]bool)
+	seenKeys := make(map[string]bool)
 
 	for page := 1; page <= s.maxPages; page++ {
 		select {
@@ -109,10 +109,11 @@ func (s *Scraper) Scrape(ctx context.Context) ([]models.Property, error) {
 			return allProperties, fmt.Errorf("failed to scrape page %d: %w", page, err)
 		}
 
-		// Deduplicate properties
+		// Deduplicate properties using UniqueKey (address+area+layout+floor)
 		for _, p := range properties {
-			if !seenIDs[p.ID] {
-				seenIDs[p.ID] = true
+			key := p.UniqueKey()
+			if !seenKeys[key] {
+				seenKeys[key] = true
 				allProperties = append(allProperties, p)
 			}
 		}

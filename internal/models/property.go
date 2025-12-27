@@ -35,6 +35,14 @@ func (p Property) TotalRentMan() float64 {
 	return p.TotalRent() / 10000
 }
 
+// UniqueKey generates a unique identifier based on property attributes.
+// This is used to detect duplicate properties that may have different IDs
+// but represent the same physical unit.
+// Format: "address|area|layout"
+func (p Property) UniqueKey() string {
+	return fmt.Sprintf("%s|%.2f|%s", p.Address, p.Area, p.Layout)
+}
+
 // Regular expressions for parsing property data.
 var (
 	// rentManRegex matches patterns like "7.9万円", "10万円", "7.9万", "10万"

@@ -146,16 +146,17 @@ func propertyToRecord(p Property) []string {
 }
 
 // FindNewProperties returns properties that exist in current but not in previous.
-// Comparison is based on property ID.
+// Comparison is based on UniqueKey (address+area+layout+floor) to handle
+// cases where the same property is re-registered with a different ID.
 func FindNewProperties(current, previous []Property) []Property {
-	prevIDs := make(map[string]bool)
+	prevKeys := make(map[string]bool)
 	for _, p := range previous {
-		prevIDs[p.ID] = true
+		prevKeys[p.UniqueKey()] = true
 	}
 
 	var newProps []Property
 	for _, p := range current {
-		if !prevIDs[p.ID] {
+		if !prevKeys[p.UniqueKey()] {
 			newProps = append(newProps, p)
 		}
 	}
@@ -163,24 +164,28 @@ func FindNewProperties(current, previous []Property) []Property {
 	return newProps
 }
 
-// MergeProperties merges two property lists, removing duplicates by ID.
+// MergeProperties merges two property lists, removing duplicates by UniqueKey.
 // Properties from 'current' take precedence over 'previous'.
+// Uses UniqueKey (address+area+layout+floor) to handle cases where
+// the same property is re-registered with a different ID.
 func MergeProperties(current, previous []Property) []Property {
 	seen := make(map[string]bool)
 	var result []Property
 
 	// Add current properties first
 	for _, p := range current {
-		if !seen[p.ID] {
-			seen[p.ID] = true
+		key := p.UniqueKey()
+		if !seen[key] {
+			seen[key] = true
 			result = append(result, p)
 		}
 	}
 
 	// Add previous properties that aren't in current
 	for _, p := range previous {
-		if !seen[p.ID] {
-			seen[p.ID] = true
+		key := p.UniqueKey()
+		if !seen[key] {
+			seen[key] = true
 			result = append(result, p)
 		}
 	}
