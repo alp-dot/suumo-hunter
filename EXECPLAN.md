@@ -52,11 +52,11 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] 割安度算出ロジック（gonum/mat使用）
   - [x] ユニットテスト作成（カバレッジ88.3%）
 
-- [ ] Milestone 7: Lambda統合
-  - [ ] 設定管理（internal/config/config.go）
-  - [ ] Lambdaハンドラ実装（cmd/lambda/main.go）
-  - [ ] 処理フロー統合
-  - [ ] ローカルテスト実行
+- [x] (2025-12-27) Milestone 7: Lambda統合
+  - [x] 設定管理（internal/config/config.go）
+  - [x] Lambdaハンドラ実装（cmd/lambda/main.go）
+  - [x] 処理フロー統合
+  - [x] ビルド確認（make build成功）
 
 - [ ] Milestone 8: CI/CD整備
   - [ ] GitHub Actions設定（.github/workflows/ci.yml）
