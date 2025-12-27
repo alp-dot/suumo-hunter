@@ -58,9 +58,9 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] 処理フロー統合
   - [x] ビルド確認（make build成功）
 
-- [ ] Milestone 8: CI/CD整備
-  - [ ] GitHub Actions設定（.github/workflows/ci.yml）
-  - [ ] lint + testパイプライン
+- [x] (2025-12-27) Milestone 8: CI/CD整備
+  - [x] GitHub Actions設定（.github/workflows/ci.yml）
+  - [x] lint + test + buildパイプライン
 
 - [ ] Milestone 9: インフラ構築
   - [ ] Terraform初期化
