@@ -189,7 +189,7 @@ Discord Webhook APIを使用して以下の形式で通知する。
 ## 6. プロジェクト構成
 
 ```
-suumo-hunter-go/
+suumo-hunter/
 ├── cmd/
 │   └── lambda/
 │       └── main.go              # Lambdaエントリポイント

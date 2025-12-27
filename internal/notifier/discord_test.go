@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alp/suumo-hunter-go/internal/models"
+	"github.com/alp/suumo-hunter/internal/models"
 )
 
 // mockHTTPClient is a mock implementation of HTTPClient for testing.

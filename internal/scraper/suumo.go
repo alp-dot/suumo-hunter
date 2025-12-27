@@ -12,7 +12,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/avast/retry-go/v4"
 
-	"github.com/alp/suumo-hunter-go/internal/models"
+	"github.com/alp/suumo-hunter/internal/models"
 )
 
 const (

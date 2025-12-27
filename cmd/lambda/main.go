@@ -10,12 +10,12 @@ import (
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/alp/suumo-hunter-go/internal/analyzer"
-	"github.com/alp/suumo-hunter-go/internal/config"
-	"github.com/alp/suumo-hunter-go/internal/models"
-	"github.com/alp/suumo-hunter-go/internal/notifier"
-	"github.com/alp/suumo-hunter-go/internal/scraper"
-	"github.com/alp/suumo-hunter-go/internal/storage"
+	"github.com/alp/suumo-hunter/internal/analyzer"
+	"github.com/alp/suumo-hunter/internal/config"
+	"github.com/alp/suumo-hunter/internal/models"
+	"github.com/alp/suumo-hunter/internal/notifier"
+	"github.com/alp/suumo-hunter/internal/scraper"
+	"github.com/alp/suumo-hunter/internal/storage"
 )
 
 func main() {

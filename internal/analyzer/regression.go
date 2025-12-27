@@ -2,8 +2,8 @@
 package analyzer
 
 import (
-	"github.com/alp/suumo-hunter-go/internal/models"
-	"github.com/alp/suumo-hunter-go/internal/notifier"
+	"github.com/alp/suumo-hunter/internal/models"
+	"github.com/alp/suumo-hunter/internal/notifier"
 
 	"gonum.org/v1/gonum/mat"
 )

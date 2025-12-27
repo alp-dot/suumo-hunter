@@ -4,8 +4,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/alp/suumo-hunter-go/internal/models"
-	"github.com/alp/suumo-hunter-go/internal/notifier"
+	"github.com/alp/suumo-hunter/internal/models"
+	"github.com/alp/suumo-hunter/internal/notifier"
 )
 
 // generateTestProperties creates test properties with predictable patterns.

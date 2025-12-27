@@ -1,4 +1,4 @@
-module github.com/alp/suumo-hunter-go
+module github.com/alp/suumo-hunter
 
 go 1.25.5
 

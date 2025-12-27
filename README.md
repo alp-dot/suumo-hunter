@@ -23,8 +23,8 @@ SUUMOの賃貸物件を自動でスクレイピングし、新着物件をDiscor
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/your-username/suumo-hunter-go.git
-cd suumo-hunter-go
+git clone https://github.com/your-username/suumo-hunter.git
+cd suumo-hunter
 ```
 
 ### 2. Discord Webhook URLの取得

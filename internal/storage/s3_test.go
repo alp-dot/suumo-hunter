@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 
-	"github.com/alp/suumo-hunter-go/internal/models"
+	"github.com/alp/suumo-hunter/internal/models"
 )
 
 // mockS3Client is a mock implementation of S3API for testing.

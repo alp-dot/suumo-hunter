@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alp/suumo-hunter-go/internal/models"
+	"github.com/alp/suumo-hunter/internal/models"
 )
 
 const (

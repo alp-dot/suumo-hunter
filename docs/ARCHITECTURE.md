@@ -70,7 +70,7 @@
 ## プロジェクト構成
 
 ```
-suumo-hunter-go/
+suumo-hunter/
 ├── cmd/
 │   └── lambda/
 │       └── main.go              # Lambdaエントリポイント
