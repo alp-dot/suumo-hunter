@@ -259,7 +259,7 @@ func TestFormatPropertyEntry(t *testing.T) {
 				Score: 12800,
 				Label: ScoreLabelBargain,
 			},
-			contains: []string{"🏠", "お買い得", "お得マンション", "8.4万円", "12800円/月 お得"},
+			contains: []string{"■ お得マンション", "8.4万円", "12800円/月 お得"},
 		},
 		{
 			name: "expensive property",
@@ -274,7 +274,7 @@ func TestFormatPropertyEntry(t *testing.T) {
 				Score: -15000,
 				Label: ScoreLabelExpensive,
 			},
-			contains: []string{"🏠", "割高", "高いマンション", "16.0万円", "15000円/月 高い"},
+			contains: []string{"■ 高いマンション", "16.0万円", "15000円/月 高い"},
 		},
 		{
 			name: "analyzing property",
@@ -289,7 +289,7 @@ func TestFormatPropertyEntry(t *testing.T) {
 				Score: 0,
 				Label: ScoreLabelAnalyzing,
 			},
-			contains: []string{"🏠", "分析中"},
+			contains: []string{"■ 分析中マンション", "10.5万円"},
 		},
 	}
 
@@ -325,27 +325,6 @@ func TestConvertToPropertyWithScore(t *testing.T) {
 		if p.Score != 0 {
 			t.Errorf("Property[%d].Score = %f, want 0", i, p.Score)
 		}
-	}
-}
-
-func TestGetLabelIcon(t *testing.T) {
-	notifier := NewNotifier("test-token")
-
-	// All labels should return the same unified icon
-	labels := []ScoreLabel{
-		ScoreLabelBargain,
-		ScoreLabelExpensive,
-		ScoreLabelAnalyzing,
-		ScoreLabelStandard,
-	}
-
-	for _, label := range labels {
-		t.Run(string(label), func(t *testing.T) {
-			got := notifier.getLabelIcon(label)
-			if got != "🏠" {
-				t.Errorf("getLabelIcon(%v) = %q, want %q", label, got, "🏠")
-			}
-		})
 	}
 }
 

@@ -173,9 +173,8 @@ func (n *Notifier) formatMessages(properties []PropertyWithScore) []string {
 func (n *Notifier) formatPropertyEntry(prop PropertyWithScore) string {
 	var sb strings.Builder
 
-	// Icon based on score label
-	icon := n.getLabelIcon(prop.Label)
-	sb.WriteString(fmt.Sprintf("\n%s【%s】%s\n", icon, prop.Label, prop.Property.Name))
+	// Property name
+	sb.WriteString(fmt.Sprintf("\n■ %s\n", prop.Property.Name))
 
 	// Address
 	sb.WriteString(fmt.Sprintf("📍 %s\n", prop.Property.Address))
@@ -187,24 +186,16 @@ func (n *Notifier) formatPropertyEntry(prop PropertyWithScore) string {
 	// Score
 	if prop.Label != ScoreLabelAnalyzing {
 		if prop.Score >= 0 {
-			sb.WriteString(fmt.Sprintf("💴 相場より %.0f円/月 お得！\n", prop.Score))
+			sb.WriteString(fmt.Sprintf("💴 相場より %.0f円/月 お得\n", prop.Score))
 		} else {
 			sb.WriteString(fmt.Sprintf("💴 相場より %.0f円/月 高い\n", -prop.Score))
 		}
-	} else {
-		sb.WriteString("💴 分析中\n")
 	}
 
 	// URL
 	sb.WriteString(fmt.Sprintf("🔗 %s\n", prop.Property.URL))
 
 	return sb.String()
-}
-
-// getLabelIcon returns the emoji icon for a score label.
-// Using a unified icon for cleaner appearance.
-func (n *Notifier) getLabelIcon(_ ScoreLabel) string {
-	return "🏠"
 }
 
 // send sends a message to LINE Notify.
