@@ -34,6 +34,16 @@ func TestParseRent(t *testing.T) {
 			want:  85000,
 		},
 		{
+			name:  "yen format without 万",
+			input: "5000円",
+			want:  5000,
+		},
+		{
+			name:  "yen format with comma",
+			input: "10,000円",
+			want:  10000,
+		},
+		{
 			name:  "empty string",
 			input: "",
 			want:  0,

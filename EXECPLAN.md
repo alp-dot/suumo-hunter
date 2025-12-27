@@ -29,12 +29,12 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] データ変換ユーティリティ（万円→円変換など）
   - [x] ユニットテスト作成（カバレッジ90.2%）
 
-- [ ] Milestone 3: スクレイピング機能実装
-  - [ ] SUUMOスクレイパー実装（internal/scraper/suumo.go）
-  - [ ] HTMLパース処理
-  - [ ] ページネーション対応
-  - [ ] リトライ処理（指数バックオフ）
-  - [ ] ユニットテスト作成
+- [x] (2025-12-27) Milestone 3: スクレイピング機能実装
+  - [x] SUUMOスクレイパー実装（internal/scraper/suumo.go）
+  - [x] HTMLパース処理（goquery使用）
+  - [x] ページネーション対応
+  - [x] リトライ処理（指数バックオフ、retry-go使用）
+  - [x] ユニットテスト作成（カバレッジ94.6%）
 
 - [ ] Milestone 4: ストレージ機能実装
   - [ ] S3クライアント実装（internal/storage/s3.go）
@@ -135,6 +135,24 @@ Milestone 2でデータモデル（Property構造体）を実装する
 
 **次のステップ:**
 Milestone 3でSUUMOスクレイピング機能を実装する
+
+### Milestone 3 完了 (2025-12-27)
+
+**達成事項:**
+- SUUMOスクレイパーを実装（internal/scraper/suumo.go）
+- goqueryを使用したHTMLパース処理
+- ページネーション対応（最大ページ数設定可能）
+- retry-goを使用したリトライ処理（指数バックオフ）
+- 機能オプションパターンによる設定（WithMaxPages, WithRetryAttempts等）
+- モックサーバーを使用した統合テスト
+- ParseRent関数を改善（「5000円」形式もサポート）
+
+**検証結果:**
+- `make lint` → エラーなし
+- `make test` → 全テストPASS（scraper: カバレッジ94.6%）
+
+**次のステップ:**
+Milestone 4でS3ストレージ機能を実装する
 
 
 ---

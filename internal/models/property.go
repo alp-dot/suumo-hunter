@@ -37,8 +37,11 @@ func (p Property) TotalRentMan() float64 {
 
 // Regular expressions for parsing property data.
 var (
-	// rentRegex matches patterns like "7.9万円", "10万円", "7.9万", "10万"
-	rentRegex = regexp.MustCompile(`([\d.]+)\s*万円?`)
+	// rentManRegex matches patterns like "7.9万円", "10万円", "7.9万", "10万"
+	rentManRegex = regexp.MustCompile(`([\d.]+)\s*万円?`)
+
+	// rentYenRegex matches patterns like "5000円", "10000円" (without 万)
+	rentYenRegex = regexp.MustCompile(`^([\d,]+)\s*円$`)
 
 	// areaRegex matches patterns like "25.5m²", "25.5㎡", "25.5"
 	areaRegex = regexp.MustCompile(`([\d.]+)\s*[m㎡²]*`)
@@ -54,7 +57,11 @@ var (
 	floorRegex = regexp.MustCompile(`^(\d+)(?:-\d+)?階`)
 )
 
-// ParseRent converts a rent string like "7.9万円" to yen (79000.0).
+// ParseRent converts a rent string to yen.
+// Supports formats like:
+//   - "7.9万円", "10万円" (万円 format) -> 79000.0, 100000.0
+//   - "5000円", "10,000円" (円 format without 万) -> 5000.0, 10000.0
+//
 // Returns 0 if the string cannot be parsed.
 func ParseRent(s string) (float64, error) {
 	s = strings.TrimSpace(s)
@@ -62,18 +69,30 @@ func ParseRent(s string) (float64, error) {
 		return 0, nil
 	}
 
-	matches := rentRegex.FindStringSubmatch(s)
-	if len(matches) < 2 {
-		return 0, fmt.Errorf("invalid rent format: %q", s)
+	// First try 万円 format
+	matches := rentManRegex.FindStringSubmatch(s)
+	if len(matches) >= 2 {
+		value, err := strconv.ParseFloat(matches[1], 64)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse rent value: %w", err)
+		}
+		// Convert from 万円 to 円
+		return value * 10000, nil
 	}
 
-	value, err := strconv.ParseFloat(matches[1], 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse rent value: %w", err)
+	// Try 円 format (without 万)
+	matches = rentYenRegex.FindStringSubmatch(s)
+	if len(matches) >= 2 {
+		// Remove commas from the number
+		numStr := strings.ReplaceAll(matches[1], ",", "")
+		value, err := strconv.ParseFloat(numStr, 64)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse rent value: %w", err)
+		}
+		return value, nil
 	}
 
-	// Convert from 万円 to 円
-	return value * 10000, nil
+	return 0, fmt.Errorf("invalid rent format: %q", s)
 }
 
 // ParseArea converts an area string like "25.5m²" to float64 (25.5).
