@@ -47,10 +47,10 @@ This ExecPlan is a living document. The sections `Progress`, `Surprises & Discov
   - [x] 文字数制限・分割送信（1000文字、10件上限）
   - [x] ユニットテスト作成（モック使用、カバレッジ92.6%）
 
-- [ ] Milestone 6: 分析機能実装
-  - [ ] 重回帰分析実装（internal/analyzer/regression.go）
-  - [ ] 割安度算出ロジック
-  - [ ] ユニットテスト作成
+- [x] (2025-12-27) Milestone 6: 分析機能実装
+  - [x] 重回帰分析実装（internal/analyzer/regression.go）
+  - [x] 割安度算出ロジック（gonum/mat使用）
+  - [x] ユニットテスト作成（カバレッジ88.3%）
 
 - [ ] Milestone 7: Lambda統合
   - [ ] 設定管理（internal/config/config.go）
@@ -175,7 +175,6 @@ Milestone 5でLINE通知機能を実装する
 **達成事項:**
 - LINE Notifyクライアントを実装（internal/notifier/line.go）
 - SPEC.md準拠のメッセージフォーマット
-  - お買い得（🔥）、標準（😐）、割高（💸）、分析中（🔍）のラベル表示
   - 総賃料（万円）、割安度（円/月）を表示
 - 文字数制限・分割送信（1000文字上限、10件上限）
 - HTTPClientインターフェースによるモック対応
@@ -188,6 +187,24 @@ Milestone 5でLINE通知機能を実装する
 
 **次のステップ:**
 Milestone 6で重回帰分析機能を実装する
+
+### Milestone 6 完了 (2025-12-27)
+
+**達成事項:**
+- 重回帰分析をgonum/matを使用して実装（internal/analyzer/regression.go）
+- 目的変数: 総賃料（rent + management_fee）
+- 説明変数: 専有面積、築年数、階数、駅徒歩分数
+- 正規方程式による係数算出: β = (X'X)^(-1) X'y
+- お得度（円）= 予測総賃料 - 実際総賃料
+- 最低サンプル数: 10件（不足時は「分析中」ラベル）
+- AnalyzeNewProperties: 全データで回帰、新着物件のみスコア算出
+
+**検証結果:**
+- `make lint` → エラーなし
+- `make test` → 全テストPASS（analyzer: カバレッジ88.3%）
+
+**次のステップ:**
+Milestone 7でLambda統合を実装する
 
 
 ---

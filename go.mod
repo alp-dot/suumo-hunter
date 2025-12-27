@@ -7,6 +7,7 @@ require (
 	github.com/avast/retry-go/v4 v4.7.0
 	github.com/aws/aws-sdk-go-v2 v1.41.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0
+	gonum.org/v1/gonum v0.16.0
 )
 
 require (
